@@ -1,1 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>WhatsApp Pair Panel</title>
+  <style>
+    body {
+      background: #0f0f0f;
+      color: white;
+      font-family: Arial;
+      text-align: center;
+      padding-top: 80px;
+    }
 
+    input, button {
+      padding: 10px;
+      margin: 10px;
+      width: 250px;
+      border-radius: 5px;
+      border: none;
+    }
+
+    button {
+      background: #00c853;
+      color: white;
+      cursor: pointer;
+    }
+
+    .box {
+      margin-top: 20px;
+      font-size: 20px;
+      color: #00e676;
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>🤖 WhatsApp Pair Panel</h1>
+
+<input id="number" placeholder="Enter number e.g 27835515085" />
+<br>
+<button onclick="generate()">Generate Pair Code</button>
+
+<div class="box" id="result"></div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+const socket = io();
+
+socket.on("pair", (data) => {
+  document.getElementById("result").innerHTML =
+    "📱 " + data.number + "<br>🔐 CODE: <b>" + data.code + "</b>";
+});
+
+function generate() {
+  const number = document.getElementById("number").value;
+
+  fetch("/pair", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ number })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      document.getElementById("result").innerHTML =
+        "🔐 CODE: <b>" + data.code + "</b>";
+    } else {
+      document.getElementById("result").innerHTML =
+        "❌ " + data.error;
+    }
+  });
+}
+</script>
+
+</body>
+</html>
